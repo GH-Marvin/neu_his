@@ -3,10 +3,10 @@ package com.edu.neu.util;
 import com.edu.neu.vo.ResultVO;
 
 public class ResultUtil {
-    public static ResultVO success(Object data) {
+    public static ResultVO success(String msg,Object data) {
         ResultVO resultVO = new ResultVO();
         resultVO.setCode(0);
-        resultVO.setMsg("成功");
+        resultVO.setMsg(msg);
         resultVO.setData(data);
         return resultVO;
     }

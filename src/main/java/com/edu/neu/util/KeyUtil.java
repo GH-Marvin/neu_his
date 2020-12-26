@@ -9,7 +9,6 @@ public class KeyUtil {
         Integer key = random.nextInt(900000) + 100000;
         return System.currentTimeMillis() + String.valueOf(key);
     }
-
     public static void main(String[] args) {
         System.out.println(createUniqueKey());
     }

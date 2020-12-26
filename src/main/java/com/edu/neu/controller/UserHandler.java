@@ -34,10 +34,10 @@ public class UserHandler {
         if(user != null){
             if(userVO.getPassword().equals(user.getPassword())){
                 if(user.getRoleId() == 2){
-                    return ResultUtil.success("patientMenu");
+                    return ResultUtil.success("登录成功！即将跳转至挂号员界面...","patientMenu");
                 }
                 else if(user.getRoleId() == 3){
-                    return ResultUtil.success("doctorMenu");
+                    return ResultUtil.success("登录成功！即将跳转至医生界面...","doctorMenu");
                 }else {
                     return ResultUtil.fail("暂时无权限访问进一步页面！");
                 }
