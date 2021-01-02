@@ -6,7 +6,10 @@ spring:
     url: jdbc:mysql://localhost:3306/his?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=Asia/Shanghai
     username: root
     password: liu2251952966
+  thymeleaf:
+    prefix: http://127.0.0.1:8080/
+    suffix: .html
 
-mybatis-plus:
-  configuration:
-    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+#mybatis-plus:
+#  configuration:
+#    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl

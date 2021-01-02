@@ -11,4 +11,5 @@ import java.util.List;
 public interface UserService {
     public User findByUserName(String userName);
     public List<User> findAll();
+    public List<User> findByDeptId(Integer dept_id);
 }

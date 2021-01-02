@@ -7,4 +7,5 @@ import java.util.List;
 
 public interface DepartmentService {
     public List<Department> findAll();
+    public Department findById(Integer id);
 }

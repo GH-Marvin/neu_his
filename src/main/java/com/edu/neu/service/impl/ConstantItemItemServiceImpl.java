@@ -17,4 +17,9 @@ public class ConstantItemItemServiceImpl implements ConstantItemService {
     public List<Constantitem> findByTypeId(Integer id) {
         return constantItemMapper.selectList(new QueryWrapper<Constantitem>().eq("constant_type_id",id));
     }
+
+    @Override
+    public String findNameById(Integer id) {
+        return constantItemMapper.selectOne(new QueryWrapper<Constantitem>().eq("id",id)).getConstantName();
+    }
 }

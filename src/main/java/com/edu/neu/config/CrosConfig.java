@@ -15,7 +15,7 @@ public class CrosConfig {
                 registry.addMapping("/**")
                         .allowCredentials(true)
                         .allowedMethods("*")
-                        .allowedOrigins("http://127.0.0.1:8080")
+                        .allowedOrigins("http://127.0.0.1:8686")
                         .maxAge(3600);
             }
         };

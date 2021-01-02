@@ -13,7 +13,8 @@ public class User {
   private String username;
   private String password;
   private String realname;
-  private Integer roleId;
+  private String permission;
+  private String role;
   private Integer doctitleId;
   private String scheduling;
   private Integer deptId;

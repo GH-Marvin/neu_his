@@ -2,6 +2,7 @@ package com.edu.neu.entity;
 
 import javax.persistence.*;
 import lombok.Data;
+
 import java.util.Date;
 
 @Data
@@ -10,7 +11,7 @@ public class Register {
 
   @Id
   @GeneratedValue(strategy= GenerationType.IDENTITY)
-  private Integer id;
+  private String id;
   private String caseNumber;
   private String realName;
   private Integer gender;
@@ -26,7 +27,7 @@ public class Register {
   private Integer registleId;
   private Integer settleId;
   private String isBook;
-  private Date registTime;
+  private String registTime;
   private Integer registerId;
   private Integer visitState;
 

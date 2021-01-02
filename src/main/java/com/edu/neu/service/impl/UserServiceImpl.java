@@ -32,4 +32,9 @@ public class UserServiceImpl implements UserService {
         return userMapper.selectList(null);
     }
 
+    @Override
+    public List<User> findByDeptId(Integer dept_id) {
+        return userMapper.selectList(new QueryWrapper<User>().eq("dept_id",dept_id));
+    }
+
 }

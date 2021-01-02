@@ -6,4 +6,5 @@ import java.util.List;
 
 public interface ConstantItemService {
     public List<Constantitem> findByTypeId(Integer id);
+    public String findNameById(Integer id);
 }
