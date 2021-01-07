@@ -32,8 +32,7 @@ public class ShiroConfig {
 
     @Bean
     public DefaultWebSecurityManager defaultWebSecurityManager(@Qualifier("userRealm") UserRealm userRealm) {
-        DefaultWebSecurityManager manager = new DefaultWebSecurityManager(userRealm);
-        return manager;
+        return new DefaultWebSecurityManager(userRealm);
     }
 
     @Bean

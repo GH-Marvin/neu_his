@@ -11,7 +11,7 @@ public class Register {
 
   @Id
   @GeneratedValue(strategy= GenerationType.IDENTITY)
-  private String id;
+  private Integer registId;
   private String caseNumber;
   private String realName;
   private Integer gender;

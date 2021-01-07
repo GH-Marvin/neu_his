@@ -5,15 +5,14 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Date;
-
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class WestDiagnoseItemVO {
-    private Integer id;
-    @JsonProperty("ICD")
-    private String ICD;
-    private String description;
-    private String time;
+public class DrugsTemplateVO {
+    @JsonProperty("id")
+    private Integer temp_id;
+    @JsonProperty("name")
+    private String name;
+    @JsonProperty("field")
+    private String scope;
 }

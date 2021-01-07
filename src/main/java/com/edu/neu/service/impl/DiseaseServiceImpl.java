@@ -15,6 +15,7 @@ import com.edu.neu.vo.WestDiagnoseItemVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import javax.xml.crypto.Data;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,7 +24,7 @@ import java.util.stream.Collectors;
 
 @Service
 public class DiseaseServiceImpl implements DiseaseService {
-    @Autowired
+    @Resource
     private DiseaseMapper diseaseMapper;
     @Override
     public DataVO<DiseaseVO> findAll(Integer page,Integer limit) {
@@ -45,30 +46,6 @@ public class DiseaseServiceImpl implements DiseaseService {
     }
 
     @Override
-    public DataVO<WestDiagnoseItemVO> updateDiagnoseList(String data) {
-        DataVO<WestDiagnoseItemVO> dataVO = new DataVO<>();
-        dataVO.setCode(0);
-        dataVO.setMsg("");
-        Map<Integer,List> map = WestDiagnosisUtil.transformToMap(data);
-        List<Integer> idList = map.get(0);
-        List<String> timeList = map.get(1);
-        List<Disease> list =  diseaseMapper.selectList(new QueryWrapper<Disease>().in("id",idList));
-        List<WestDiagnoseItemVO> westDiagnoseItemVOList = new ArrayList<>();
-        for(int i = 0; i<list.size();i++) {
-            WestDiagnoseItemVO westDiagnoseItemVO = new WestDiagnoseItemVO();
-            westDiagnoseItemVO.setDescription(list.get(i).getDiseaseName());
-            westDiagnoseItemVO.setICD(list.get(i).getDiseaseIcd());
-            westDiagnoseItemVO.setTime(timeList.get(i));
-            westDiagnoseItemVOList.add(westDiagnoseItemVO);
-        }
-        dataVO.setCount(Long.valueOf(list.size()));
-        dataVO.setData(westDiagnoseItemVOList);
-        return dataVO;
-
-
-    }
-
-    @Override
     public DataVO<DiseaseVO> findAllByName(String name, Integer page, Integer limit) {
         DataVO<DiseaseVO> dataVO = new DataVO<>();
         dataVO.setCode(0);
@@ -85,5 +62,10 @@ public class DiseaseServiceImpl implements DiseaseService {
         dataVO.setCount(result.getTotal());
         dataVO.setData(diseaseVOList);
         return dataVO;
+    }
+
+    @Override
+    public Disease findById(Integer id) {
+        return diseaseMapper.selectOne(new QueryWrapper<Disease>().eq("id",id));
     }
 }

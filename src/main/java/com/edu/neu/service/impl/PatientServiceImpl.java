@@ -11,9 +11,11 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
+
 @Service
 public class PatientServiceImpl implements PatientService {
-    @Autowired
+    @Resource
     private PatientMapper patientMapper;
     @Override
     public void insert(Patient patient) {

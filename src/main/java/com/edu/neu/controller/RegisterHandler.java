@@ -146,7 +146,6 @@ public class RegisterHandler {
     @ResponseBody
     public ResultVO submit(@RequestBody RegisterForm registerForm){
         Register register = new Register();
-        register.setId(KeyUtil.createUniqueKey());
         BeanUtils.copyProperties(registerForm,register);
         String noon = registerForm.getNoon();
         if(noon.equals("0")){

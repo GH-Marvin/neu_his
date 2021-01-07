@@ -9,7 +9,7 @@ public class Medicalrecord {
 
   @Id
   @GeneratedValue(strategy= GenerationType.IDENTITY)
-  private Integer id;
+  private Integer medicalId;
   private String caseNumber;
   private Integer registId;
   private String readme;

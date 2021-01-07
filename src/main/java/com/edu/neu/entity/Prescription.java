@@ -6,16 +6,16 @@ import java.util.Date;
 
 @Data
 @Entity
-public class Medicaldisease {
+public class Prescription {
 
   @Id
   @GeneratedValue(strategy= GenerationType.IDENTITY)
-  private Integer mdId;
+  private Integer prescriptionId;
   private Integer medicalId;
   private Integer registId;
-  private Integer diseaseId;
-  private Integer diagnoseType;
-  private Date siskDate;
-  private Integer diagnoseCate;
+  private Integer userId;
+  private String prescriptionName;
+  private Date prescriptionTime;
+  private Integer prescriptionState;
 
 }

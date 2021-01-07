@@ -1,11 +1,16 @@
 package com.edu.neu.util;
 
+import com.edu.neu.entity.Medicaldisease;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class WestDiagnosisUtil {
+    public static String transformToString(List<Medicaldisease> list){
+        return null;
+    }
     public static Map<Integer,List> transformToMap(String data){
         System.out.println(data);
         String[] split_data = data.split(";");
