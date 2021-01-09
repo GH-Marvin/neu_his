@@ -4,22 +4,14 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.edu.neu.entity.Disease;
-import com.edu.neu.entity.Register;
 import com.edu.neu.mapper.DiseaseMapper;
 import com.edu.neu.service.DiseaseService;
-import com.edu.neu.util.WestDiagnosisUtil;
 import com.edu.neu.vo.DataVO;
 import com.edu.neu.vo.DiseaseVO;
-import com.edu.neu.vo.WaitingItemVO;
-import com.edu.neu.vo.WestDiagnoseItemVO;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import javax.annotation.Resource;
-import javax.xml.crypto.Data;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
+
 import java.util.stream.Collectors;
 
 @Service

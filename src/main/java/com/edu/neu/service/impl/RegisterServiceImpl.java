@@ -7,10 +7,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.edu.neu.entity.Medicaldisease;
 import com.edu.neu.entity.Register;
 import com.edu.neu.mapper.RegisterMapper;
-import com.edu.neu.service.ConstantItemService;
-import com.edu.neu.service.DiseaseService;
-import com.edu.neu.service.MedicalDiseaseService;
-import com.edu.neu.service.RegisterService;
+import com.edu.neu.service.*;
 import com.edu.neu.util.KeyUtil;
 import com.edu.neu.vo.DataVO;
 import com.edu.neu.vo.DoneItemVO;
@@ -37,6 +34,8 @@ public class RegisterServiceImpl implements RegisterService {
     private MedicalDiseaseService medicalDiseaseService;
     @Autowired
     private DiseaseService diseaseService;
+    @Autowired
+    private MedicalRecordService medicalRecordService;
     @Override
     public String initCaseNumber() {
         return KeyUtil.createUniqueKey();
@@ -91,6 +90,7 @@ public class RegisterServiceImpl implements RegisterService {
                 doneItemVO.setRegistId(r.getRegistId());
                 doneItemVO.setGender(constantItemService.findNameById(r.getGender()));
                 doneItemVO.setDiagnosis(transformToDiagnosis(r));
+                doneItemVO.setMedical_id(medicalRecordService.findRecordByRegistId(r.getRegistId()).getMedicalId());
                 doneItemVOList.add(doneItemVO);
             }
             dataVO.setData(doneItemVOList);

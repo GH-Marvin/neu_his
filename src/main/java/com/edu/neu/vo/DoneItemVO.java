@@ -22,4 +22,6 @@ public class DoneItemVO {
     private Integer registId;
     @JsonProperty("west_diagnosis")
     private String diagnosis;
+    @JsonProperty("medical_id")
+    private Integer medical_id;
 }
