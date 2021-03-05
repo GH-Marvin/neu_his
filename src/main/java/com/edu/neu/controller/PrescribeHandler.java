@@ -1,13 +1,23 @@
 package com.edu.neu.controller;
 
 
+import com.edu.neu.dto.PatientCostsDTO;
+import com.edu.neu.dto.PrescriptionDTO;
+import com.edu.neu.entity.Patientcosts;
+import com.edu.neu.entity.Prescription;
+import com.edu.neu.entity.Prescriptiondetailed;
+import com.edu.neu.enums.PrescriptionStatusEnum;
 import com.edu.neu.form.PrescriptionFrom;
 import com.edu.neu.service.*;
-import com.edu.neu.service.impl.PrescriptionDetailedServiceImpl;
 import com.edu.neu.util.ResultUtil;
 import com.edu.neu.vo.*;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 
 @RestController
@@ -28,6 +38,12 @@ public class PrescribeHandler {
 
     @Autowired
     private PrescriptionDetailedService prescriptionDetailedService;
+
+    @Autowired
+    private RegisterService registerService;
+
+    @Autowired
+    private PatientCostsService patientCostsService;
 
     @GetMapping("/{url}")
     public String redirect(@PathVariable("url") String url) {
@@ -67,25 +83,34 @@ public class PrescribeHandler {
             return ResultUtil.fail("此模板已经使用,不能重复使用！");
         }else{
             prescriptionService.save(prescriptionFrom);
-            prescriptionDetailedService.save(prescriptionFrom);
-            return ResultUtil.success("使用处方模板成功!", prescriptionService.findByUniqueInfo(prescriptionFrom.getRegistId(),prescriptionFrom.getUserId(),prescriptionFrom.getPrescriptionName()));
+            Integer pid = prescriptionService.findByUniqueInfo(prescriptionFrom.getRegistId(),prescriptionFrom.getUserId(),prescriptionFrom.getPrescriptionName());
+            for(PrescriptionDTO prescriptionDTO:prescriptionFrom.getData()){
+                prescriptionDTO.setPrescriptionId(pid);
+                prescriptionDetailedService.save(prescriptionDTO);
+            }
+            return ResultUtil.success("使用处方模板成功!", pid);
         }
     }
 
     @GetMapping("/initPrescriptionList")
     public DataVO<PrescriptionVO> initPrescriptionList(Integer id,Integer page,Integer limit){
-        return prescriptionService.findAllByRegistId(id,page,limit);
+        return prescriptionService.findAllByMedicalId(id,page,limit);
     }
     @GetMapping("/initPrescriptionDetailedList")
-    public DataVO<PrescriptionDetailedVO> initPrescriptionDetailedList(Integer id, Integer page,Integer limit){
+    public DataVO<PrescriptionDetailsVO> initPrescriptionDetailedList(Integer id, Integer page, Integer limit){
         return prescriptionDetailedService.findAllByPrescriptionId(id,page,limit);
     }
 
-    @GetMapping("/delete/{id}")
-    public ResultVO delete(@PathVariable("id") Integer id){
+    @GetMapping("/deletePrescription/{id}")
+    public ResultVO deletePrescription(@PathVariable("id") Integer id){
         prescriptionService.deleteById(id);
-        prescriptionDetailedService.deleteById(id);
-        return ResultUtil.success("删除成功!", null);
+        prescriptionDetailedService.deleteByPrescriptionId(id);
+        return ResultUtil.success("处方删除成功!");
+    }
+    @GetMapping("/deletePrescriptionItem/{id}")
+    public ResultVO deletePrescriptionItem(@PathVariable("id") Integer id){
+        prescriptionDetailedService.deleteByPdId(id);
+        return ResultUtil.success("药品删除成功!");
     }
     @PostMapping("/savePrescription")
     @ResponseBody
@@ -99,4 +124,97 @@ public class PrescribeHandler {
         }
     }
 
+    @PostMapping("/saveMedicine")
+    @ResponseBody
+    public ResultVO saveMedicine(@RequestBody PrescriptionDTO prescriptionDTO){
+        Prescriptiondetailed prescriptiondetailed = prescriptionDetailedService.findByUniqueInfo(prescriptionDTO.getPrescriptionId(),prescriptionDTO.getDrugsId());
+        if(prescriptiondetailed != null){
+            return ResultUtil.fail("此药品已被添加,不能重复添加！");
+        }else{
+            prescriptionDetailedService.save(prescriptionDTO);
+            return ResultUtil.success("添加药品成功!");
+        }
+    }
+
+    /**
+     * 计算当前处方总价
+     * @param id
+     * @return
+     */
+    @GetMapping("/calculateTotalPrice/{id}")
+    public ResultVO calculateTotalPrice(@PathVariable("id") Integer id) {
+        Double total_price = prescriptionDetailedService.calculateTotalPrice(id);
+        return ResultUtil.success("计算总价成功！",total_price);
+    }
+
+
+    @PostMapping("/submit")
+    @ResponseBody
+    public ResultVO submit(@RequestBody PatientCostsDTO patientCostsDTO) {
+        Integer medical_id = patientCostsDTO.getMedicalId();
+        List<Prescription> list = prescriptionService.findByMedicalId(medical_id);
+        boolean flag = false;
+        List<Patientcosts> data = new ArrayList<>();
+        for(Prescription p : list) {
+            if(p.getPrescriptionState() == 168) {
+                flag = true;
+                prescriptionService.updateStateById(p.getPrescriptionId() , PrescriptionStatusEnum.SUBMITTED.getCode());
+                List<PrescriptionDetailsVO> voList = prescriptionDetailedService.findAllByPrescriptionId(p.getPrescriptionId() , 1 , 99).getData();
+                for(PrescriptionDetailsVO vo : voList) {
+                    Patientcosts patientcosts = new Patientcosts();
+                    BeanUtils.copyProperties(patientCostsDTO , patientcosts);
+                    patientcosts.setItemId(vo.getDrugsId());
+                    patientcosts.setInvoiceId(-1);
+                    patientcosts.setName(vo.getDrugsName());
+                    patientcosts.setPrice(vo.getDrugsPrice());
+                    patientcosts.setAmount(vo.getAmount());
+                    patientcosts.setCreateTime(new Date());
+                    patientcosts.setState(1);
+                    data.add(patientcosts);
+                    patientCostsService.addPatientCosts(patientcosts);
+                }
+            }else {
+                continue;
+            }
+        }
+        if(flag == true) {
+            registerService.updateVisitState(patientCostsDTO.getRegistId() , 3);
+            return ResultUtil.success("处方开立成功！" , data);
+        }else {
+            switch (list.get(list.size() - 1).getPrescriptionState()) {
+                case 169:
+                    return ResultUtil.fail("已开立，无需重复开立！");
+                case 170:
+                    return ResultUtil.fail("已作废，不能开立！");
+            }
+        }
+        return ResultUtil.fail("未知错误！");
+
+    }
+
+
+    @PostMapping("/cancel")
+    @ResponseBody
+    public ResultVO cancel(@RequestBody PatientCostsDTO patientCostsDTO) {
+        Integer medical_id = patientCostsDTO.getMedicalId();
+        Integer regist_id = patientCostsDTO.getRegistId();
+        Integer dept_id = patientCostsDTO.getDeptId();
+        Integer create_oper_id = patientCostsDTO.getCreateOperId();
+        Integer item_type = patientCostsDTO.getItemType();
+        List<Prescription> list = prescriptionService.findByMedicalId(medical_id);
+        boolean flag = false;
+        for (Prescription p : list) {
+            if(p.getPrescriptionState() == 169) {
+                flag = true;
+                prescriptionService.updateStateById(p.getPrescriptionId() , PrescriptionStatusEnum.CANCEL.getCode());
+                patientCostsService.deletePatientCostsByUniqueInfo(regist_id , dept_id , create_oper_id , item_type);
+
+            }
+        }
+        if(flag == true) {
+            registerService.updateVisitState(regist_id, 2);
+            return ResultUtil.success("处方作废成功！");
+        }
+        return ResultUtil.fail("已作废，无需重复作废！");
+    }
 }

@@ -6,10 +6,11 @@ import com.edu.neu.entity.Register;
 import com.edu.neu.form.RegisterForm;
 
 public interface PatientService {
-    public void insert(Patient patient);
-    public Patient findById(Integer id);
-    public Patient findByCaseNumber(String caseNumber);
-    public void saveOrUpdate(RegisterForm registerForm);
-    public Integer getMaxId();
-    public void remove(String caseNumber);
+    void insert(Patient patient);
+    void remove(String caseNumber);
+    Patient findById(Integer id);
+    Patient findByCaseNumber(String caseNumber);
+    void saveOrUpdate(RegisterForm registerForm);
+    Integer getMaxId();
+
 }

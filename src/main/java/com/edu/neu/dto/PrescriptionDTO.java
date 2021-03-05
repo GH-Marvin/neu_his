@@ -5,6 +5,8 @@ import lombok.Data;
 
 @Data
 public class PrescriptionDTO {
+    @JsonProperty("pid")
+    private Integer prescriptionId;
     @JsonProperty("drugs_id")
     private Integer drugsId;
     @JsonProperty("use")

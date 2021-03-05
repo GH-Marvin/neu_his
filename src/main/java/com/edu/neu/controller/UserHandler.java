@@ -54,6 +54,7 @@ public class UserHandler {
                 map.put("registerId",user.getId().toString());
                 map.put("realname",user.getRealname());
                 map.put("dept",departmentService.findById(user.getDeptId()).getDeptName());
+                map.put("deptId" , user.getDeptId().toString());
                 return ResultUtil.success("登录成功！即将跳转至医生界面...",map);
 
             }else if(user.getPermission().equals("patientMenu")){

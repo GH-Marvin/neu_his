@@ -6,13 +6,11 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.edu.neu.entity.Medicaldisease;
 import com.edu.neu.entity.Register;
+import com.edu.neu.enums.RegisterStatusEnum;
 import com.edu.neu.mapper.RegisterMapper;
 import com.edu.neu.service.*;
 import com.edu.neu.util.KeyUtil;
-import com.edu.neu.vo.DataVO;
-import com.edu.neu.vo.DoneItemVO;
-import com.edu.neu.vo.RegisterVO;
-import com.edu.neu.vo.WaitingItemVO;
+import com.edu.neu.vo.*;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -36,16 +34,36 @@ public class RegisterServiceImpl implements RegisterService {
     private DiseaseService diseaseService;
     @Autowired
     private MedicalRecordService medicalRecordService;
+    @Autowired
+    private DepartmentService departmentService;
     @Override
     public String initCaseNumber() {
         return KeyUtil.createUniqueKey();
     }
 
     @Override
-    public RegisterVO findVOById(String caseNumber) {
-        RegisterVO registerVO = new RegisterVO();
-        BeanUtils.copyProperties(findById(caseNumber),registerVO);
-        return registerVO;
+    public PatientVO findVOById(String caseNumber) {
+        PatientVO patientVO = new PatientVO();
+        BeanUtils.copyProperties(findById(caseNumber), patientVO);
+        return patientVO;
+    }
+
+    @Override
+    public List<RegisterVO> findRegisterVOByCaseNumber(String caseNumber, Integer visit_state) {
+        List<Register> list = registerMapper.selectList(new QueryWrapper<Register>().eq("case_number" , caseNumber).eq("visit_state" , visit_state));
+        List<RegisterVO> ans = new ArrayList<>();
+        if(list == null) {
+            return null;
+        }
+        for(Register r : list) {
+            RegisterVO vo = new RegisterVO();
+            BeanUtils.copyProperties(r , vo);
+            vo.setVisitDate(new SimpleDateFormat("yyyy-MM-dd").format(r.getVisitDate().getTime()));
+            vo.setDeptName(departmentService.findById(r.getDeptId()).getDeptName());
+            vo.setVisitState("挂号");
+            ans.add(vo);
+        }
+        return ans;
     }
 
     @Override
@@ -69,7 +87,7 @@ public class RegisterServiceImpl implements RegisterService {
         IPage<Register> result = registerMapper.selectPage(itemsIPage, morning_queryWrapper.eq("user_id",doctor_id).eq("visit_date",today).eq("visit_state",visit_state));
         List<Register> list = result.getRecords();
         dataVO.setCount(result.getTotal());
-        if(visit_state==1){
+        if(visit_state == 1){
             List<WaitingItemVO> waitingItemVOList = list.stream().map(e -> new WaitingItemVO(
                     e.getCaseNumber(),
                     e.getRealName(),
@@ -79,7 +97,7 @@ public class RegisterServiceImpl implements RegisterService {
             )).collect(Collectors.toList());
             dataVO.setData(waitingItemVOList);
             return dataVO;
-        }else if(visit_state==2){
+        }else if(visit_state == 2){
 
             List<DoneItemVO> doneItemVOList = new ArrayList<>();
             for(Register r: list){
@@ -107,7 +125,12 @@ public class RegisterServiceImpl implements RegisterService {
     public void updateVisitState(Integer id, Integer visit_state) {
         UpdateWrapper<Register> updateWrapper = new UpdateWrapper<>();
         updateWrapper.eq("regist_id",id).set("visit_state",visit_state);
-        registerMapper.update(null,updateWrapper);
+        registerMapper.update(null , updateWrapper);
+    }
+
+    @Override
+    public List<Register> findByCaseNumberAndVisitState(String caseNumber, Integer visitState) {
+        return registerMapper.selectList(new QueryWrapper<Register>().eq("case_number" , caseNumber).eq("visit_state" , RegisterStatusEnum.PAY.getCode()));
     }
 
     public String transformToDiagnosis(Register r){

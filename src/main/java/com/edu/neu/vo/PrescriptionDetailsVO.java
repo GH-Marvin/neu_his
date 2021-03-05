@@ -8,7 +8,13 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class PrescriptionDetailedVO {
+public class PrescriptionDetailsVO {
+    @JsonProperty("id")
+    private Integer pdId;
+    @JsonProperty("p_id")
+    private Integer prescriptionId;
+    @JsonProperty("drugs_id")
+    private Integer drugsId;
     @JsonProperty("name")
     private String drugsName;
     @JsonProperty("format")

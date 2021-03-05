@@ -1,19 +1,15 @@
 package com.edu.neu.controller;
 
-import com.edu.neu.dto.PatientDTO;
 import com.edu.neu.entity.Patient;
 import com.edu.neu.entity.Register;
 import com.edu.neu.entity.Registlevel;
 import com.edu.neu.entity.User;
 import com.edu.neu.form.RegisterForm;
 import com.edu.neu.service.*;
-import com.edu.neu.util.KeyUtil;
 import com.edu.neu.util.ResultUtil;
 import com.edu.neu.vo.ConstantVO;
-import com.edu.neu.vo.RegisterVO;
+import com.edu.neu.vo.PatientVO;
 import com.edu.neu.vo.ResultVO;
-import org.apache.shiro.SecurityUtils;
-import org.apache.shiro.subject.Subject;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -59,6 +55,7 @@ public class RegisterHandler {
         List<ConstantVO> caseNumList = new ArrayList<>();
         caseNumList.add(constantVO);
         map.put("caseNumber",caseNumList);
+        patientService.remove(caseNum);
         //map加入初始化号别列表
         List<ConstantVO> registlevelList = new ArrayList<>();
         for(Registlevel rl : registLevelService.findAll()){
@@ -93,29 +90,23 @@ public class RegisterHandler {
 
     @GetMapping("/findById/{record_id}")
     public ResultVO findById(@PathVariable("record_id") String record_id) {
-        if(record_id!=null&&record_id!=""){
-            String[] split = record_id.split("&");
-            Patient patient = patientService.findByCaseNumber(split[0]);
-            if(split.length==2&&!split[0].equals(split[1])) {
-
-                    //删除原先病历号的空白病人
-                    patientService.remove(split[1]);
-
-            }
-            if(patient!=null){
-                RegisterVO registerVO = new RegisterVO();
-                BeanUtils.copyProperties(patient,registerVO);
+        System.out.println(record_id);
+        if(record_id != null){
+            Patient patient = patientService.findByCaseNumber(record_id);
+            if(patient != null){
+                PatientVO patientVO = new PatientVO();
+                BeanUtils.copyProperties(patient, patientVO);
                 if(patient.getBirthDate()!=null) {
-                    registerVO.setBirthDate(new SimpleDateFormat("yyyy-MM-dd").format(patient.getBirthDate()));
+                    patientVO.setBirthDate(new SimpleDateFormat("yyyy-MM-dd").format(patient.getBirthDate()));
                 }else {
-                    registerVO.setBirthDate("");
+                    patientVO.setBirthDate("");
                 }
-                return ResultUtil.success("查询成功！",registerVO);
+                return ResultUtil.success("查询成功！", patientVO);
             }else {
-                return ResultUtil.fail("未找到该患者信息！");
+                return ResultUtil.fail("查询失败，未找到该患者信息！");
             }
         }else {
-            return ResultUtil.fail("输入为空！");
+            return ResultUtil.fail("查询失败，输入为空！");
         }
 
     }

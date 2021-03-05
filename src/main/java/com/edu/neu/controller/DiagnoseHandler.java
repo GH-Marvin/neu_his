@@ -1,11 +1,8 @@
 package com.edu.neu.controller;
 
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.edu.neu.dto.WestDiagnoseDTO;
-import com.edu.neu.entity.Disease;
-import com.edu.neu.entity.Register;
+
+import com.edu.neu.enums.RegisterStatusEnum;
 import com.edu.neu.form.DiagnosisForm;
 import com.edu.neu.service.*;
 import com.edu.neu.util.ResultUtil;
@@ -14,8 +11,6 @@ import com.edu.neu.vo.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/diagnose")
@@ -65,7 +60,7 @@ public class DiagnoseHandler {
         medicalRecordService.saveOrUpdate(diagnosisForm);
         Integer medical_id = medicalRecordService.findRecordByRegistId(diagnosisForm.getRegistId()).getMedicalId();
         medicalDiseaseService.saveOrUpdate(diagnosisForm,medical_id);
-        registerService.updateVisitState(diagnosisForm.getRegistId(),2);
+        registerService.updateVisitState(diagnosisForm.getRegistId(), RegisterStatusEnum.DIAGNOSIS.getCode());
         return ResultUtil.success("开立成功！",null);
     }
 }
