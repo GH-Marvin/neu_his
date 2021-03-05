@@ -1,9 +1,7 @@
 package com.edu.neu.controller;
 
 import com.edu.neu.entity.Invoice;
-import com.edu.neu.entity.Patient;
 import com.edu.neu.entity.Patientcosts;
-import com.edu.neu.entity.Register;
 import com.edu.neu.form.PaymentForm;
 import com.edu.neu.service.InvoiceService;
 import com.edu.neu.service.PatientCostsService;
