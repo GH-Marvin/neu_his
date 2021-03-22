@@ -90,7 +90,7 @@ WHERE table_schema = 'his' AND table_name = 'patient';
 
 ## 3、医生工作站
 
-###(1) 处方开立页面—选择药品
+### (1) 处方开立页面—选择药品
 
 **动态分页查询药品数据**
 
